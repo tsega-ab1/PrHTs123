@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>For Hermi 💙</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Quicksand', sans-serif;
+            overflow-x: hidden;
+            background: #000;
+            color: white;
+            position: relative;
+        }
+        body.scroll-frozen { overflow: hidden; position: fixed; width: 100%; }
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(to right, #4a90e2, #ec4899);
+            z-index: 1000;
+            transition: width 0.1s ease;
+            box-shadow: 0 2px 10px rgba(74,144,226,0.5);
+        }
+
+        /* Background layers */
+        .background-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transition: opacity 1.5s ease; }
+        #bg-sunrise { background: linear-gradient(to bottom, #ff6b6b 0%, #ff9a56 40%, #ffd93d 100%); opacity: 1; }
+        #bg-morning { background: linear-gradient(to bottom, #87ceeb 0%, #b0e0e6 50%, #add8e6 100%); opacity: 0; }
+        #bg-noon { background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 50%, #90e0ef 100%); opacity: 0; }
+        #bg-afternoon { background: linear-gradient(to bottom, #ffeaa7 0%, #fdcb6e 50%, #fab1a0 100%); opacity: 0; }
+        #bg-sunset { background:
+            radial-gradient(ellipse at 30% 40%, rgba(255, 107, 107, 0.4) 0%, transparent 50%),
+            radial-gradient(ellipse at 70% 30%, rgba(186, 85, 211, 0.3) 0%, transparent 50%),
+            linear-gradient(to bottom, #4a148c 0%, #7b1fa2 15%, #ba68c8 30%, #ff6b9d 50%, #ff8a65 70%, #ffab91 85%, #ffd54f 100%);
+            opacity: 0;
+        }
+        #bg-twilight { background: linear-gradient(to bottom, #1a0033 0%, #4a148c 40%, #6a1b9a 70%, #8e24aa 100%); opacity: 0; }
+        #bg-night { background: linear-gradient(to bottom, #0a0a1a 0%, #1a0033 30%, #2d1b4e 60%, #1a0033 100%); opacity: 0; }
+
+        /* Clouds */
+        .sunset-clouds { position: fixed; width: 100%; height: 100%; top: 0; left: 0; opacity: 0; transition: opacity 1.5s ease; pointer-events: none; z-index: 0; }
+        .cloud { position: absolute; background: radial-gradient(ellipse, rgba(255, 140, 0, 0.6) 0%, rgba(186, 85, 211, 0.4) 50%, transparent 70%); border-radius: 50%; filter: blur(40px); }
+        .cloud1 { width: 400px; height: 200px; top: 20%; left: 10%; animation: cloudFloat1 20s infinite; }
+        .cloud2 { width: 500px; height: 250px; top: 40%; right: 15%; animation: cloudFloat2 25s infinite; }
+        .cloud3 { width: 350px; height: 180px; top: 60%; left: 30%; animation: cloudFloat3 18s infinite; }
+        @keyframes cloudFloat1 { 0%,100%{transform:translateX(0) translateY(0);}50%{transform:translateX(50px) translateY(-30px);} }
+        @keyframes cloudFloat2 { 0%,100%{transform:translateX(0) translateY(0);}50%{transform:translateX(-40px) translateY(40px);} }
+        @keyframes cloudFloat3 { 0%,100%{transform:translateX(0) translateY(0);}50%{transform:translateX(30px) translateY(-20px);} }
+
+        /* Birds */
+        .birds { position: fixed; font-size: 24px; opacity: 0; transition: opacity 1s ease; z-index: 1; }
+        .bird1 { top: 15%; left: 20%; animation: fly1 15s infinite; }
+        .bird2 { top: 25%; left: 60%; animation: fly2 20s infinite; }
+        .bird3 { top: 10%; left: 80%; animation: fly3 18s infinite; }
+        @keyframes fly1 { 0%,100%{transform:translate(0,0);}50%{transform:translate(100px,-50px);} }
+        @keyframes fly2 { 0%,100%{transform:translate(0,0);}50%{transform:translate(-150px,80px);} }
+        @keyframes fly3 { 0%,100%{transform:translate(0,0);}50%{transform:translate(-80px,-100px);} }
+
+        /* Stars */
+        .stars { position: fixed; width: 2px; height: 2px; background: white; border-radius: 50%; opacity: 0; transition: opacity 2s ease; box-shadow: 0 0 4px white; z-index: 1; }
+        @keyframes twinkle { 0%,100%{opacity:0.3;}50%{opacity:1;} }
+
+        /* Moon */
+        .moon { position: fixed; top: 10%; right: 10%; width: 100px; height: 100px; background: #f4f4f4; border-radius: 50%; box-shadow: 0 0 60px rgba(244,244,244,0.9); opacity: 0; transition: opacity 2s ease; z-index: 1; }
+
+        /* Hearts */
+        .hearts-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
+        .connection-line { position: absolute; height: 3px; background: linear-gradient(to right, #4a90e2, #ec4899); transform-origin: left center; opacity: 0.7; transition: all 0.3s ease; box-shadow: 0 0 10px rgba(74,144,226,0.5); }
+        .heart { position: absolute; font-size: 40px; transition: all 0.3s ease; filter: drop-shadow(0 0 15px currentColor); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{transform:scale(1);}50%{transform:scale(1.15);} }
+        .heart-blue { color: #4a90e2; }
+        .heart-pink { color: #ec4899; }
+        .distance-label { position: absolute; font-size: 14px; font-weight: 700; background: rgba(0,0,0,0.8); padding: 6px 14px; border-radius: 20px; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+
+        /* Layout */
+        .container { max-width: 900px; margin: 0 auto; padding: 12px; position: relative; z-index: 5; }
+
+        .screen-intro { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .main-title { font-family: 'Playfair Display', serif; font-size: 4rem; font-weight: 700; margin-bottom: 20px; animation: fadeInDown 1.5s ease; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
+        .subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 40px; animation: fadeIn 1s 0.5s forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .start-btn { padding: 18px 50px; font-size: 1.3rem; background: rgba(255,255,255,0.25); border: 3px solid white; color: white; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(15px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); font-weight: 700; opacity: 0; animation: fadeIn 1s 1s forwards; }
+        .start-btn:hover { background: rgba(255,255,255,0.4); transform: translateY(-5px); }
+
+        /* Chat container */
+        .chat-flow { 
+            padding: 40px 0 60px;
+            min-height: 200vh;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        /* Message bubbles */
+        .bubble {
+            background: rgba(255,253,245,0.95);
+            border: 2px solid rgba(255,215,160,0.8);
+            padding: 14px 20px;
+            border-radius: 20px;
+            border-bottom-right-radius: 4px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin: 10px 12px 10px auto;
+            max-width: 75%;
+            width: fit-content;
+            align-self: flex-end;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-weight: 500;
+            color: #2c2c2c;
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 0.5s ease;
+            position: relative;
+        }
+        .bubble.visible { opacity: 1; transform: translateX(0); }
+        .bubble.large { 
+            max-width: 85%;
+            font-family: 'Playfair Display', serif; 
+            font-size: 1.6rem; 
+            font-weight: 700; 
+            background: rgba(255,245,220,0.95); 
+            border-color: rgba(74,144,226,0.6); 
+            color: #1a1a1a; 
+        }
+
+        /* Hide checkmarks */
+        .checkmark { display: none !important; }
+
+        /* Left reply */
+        .bubble-left {
+            background: rgba(255,235,245,0.95);
+            border: 2px solid rgba(236,72,153,0.6);
+            align-self: flex-start;
+            border-radius: 20px;
+            border-bottom-left-radius: 4px;
+            margin: 10px auto 10px 12px;
+            max-width: 75%;
+            width: fit-content;
+            transform: translateX(-30px);
+            padding: 14px 20px;
+        }
+        .bubble-left.visible { transform: translateX(0); }
+
+        /* Typing indicator */
+        .typing-indicator {
+            align-self: flex-end;
+            background: rgba(255,253,245,0.95);
+            border: 2px solid rgba(255,215,160,0.8);
+            padding: 14px 22px;
+            border-radius: 20px;
+            border-bottom-right-radius: 4px;
+            margin: 10px 12px 10px auto;
+            max-width: 160px;
+            width: fit-content;
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 0.6s ease;
+            display: none;
+            z-index: 30;
+        }
+        .typing-indicator.visible { opacity: 1; transform: translateX(0); display: block; }
+
+        .typing-dots { display: flex; gap: 8px; align-items: center; }
+        .typing-dots span { width: 9px; height: 9px; background: #2c2c2c; border-radius: 50%; animation: typingBounce 1.4s infinite; }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingBounce { 0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-10px);} }
+
+        /* Question wrapper */
+        .question-wrapper { 
+            margin: 80px 0 40px;
+            opacity: 0; 
+            transform: translateY(20px); 
+            transition: all 0.6s ease; 
+            text-align: center; 
+        }
+        .question-wrapper.visible { 
+            opacity: 1; 
+            transform: translateY(0); 
+            animation: slideDown 0.8s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .question-text { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 1.4rem; 
+            color: white; 
+            margin-bottom: 20px; 
+            font-weight: 600; 
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5); 
+        }
+
+        .options-container { display:flex; gap:15px; justify-content:center; flex-wrap:wrap; }
+        .option-btn {
+            background: rgba(255,255,255,0.25);
+            border: 2px solid rgba(255,255,255,0.8);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 25px;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            min-width: 160px;
+        }
+        .option-btn:hover { background: rgba(255,255,255,0.4); transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        .option-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .scroll-spacer { height: 100vh; }
+
+        /* Finale */
+        .finale-section { min-height: 100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:100px 20px; opacity:0; transform:translateY(50px); transition: all 0.8s ease; }
+        .finale-section.visible { opacity: 1; transform: translateY(0); }
+        .finale-title { font-family: 'Playfair Display', serif; font-size: 3rem; margin-bottom: 60px; font-weight: 700; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
+
+        .polaroid-stack { position: relative; width: 300px; height: 400px; margin: 40px auto; }
+        .polaroid { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(var(--rot)); width: 280px; height: 370px; background: white; padding: 15px 15px 50px 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: all 0.8s cubic-bezier(0.34,1.56,0.64,1); opacity: 0; border-radius: 4px; }
+        .polaroid img { width: 100%; height: 100%; object-fit: cover; background: #eee; }
+        .polaroid.shown { opacity: 1; }
+        .polaroid.scatter { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) rotate(var(--rot)); }
+
+        .photo-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, rgba(74,144,226,0.3), rgba(236,72,153,0.3)); display:flex; justify-content:center; align-items:center; font-size:3rem; }
+
+        .unlock-wrapper { position: relative; width: 120px; height: 120px; margin: 40px auto; }
+        .unlock-btn { width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.25); border: 3px solid white; color: white; font-size: 2.5rem; display:flex; justify-content:center; align-items:center; cursor:pointer; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:2; user-select:none; backdrop-filter: blur(10px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+        .unlock-hint { margin-top: 20px; font-size: 1rem; color: rgba(255,255,255,0.9); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+
+        .confetti-piece { position: fixed; width: 10px; height: 10px; border-radius: 50%; pointer-events: none; z-index: 1000; }
+        @keyframes confettiFall { to { transform: translateY(100vh) translateX(var(--drift)) rotate(720deg); opacity: 0; } }
+
+        .final-letter { max-width: 650px; background: rgba(255,255,255,0.95); padding: 40px; border-radius: 20px; margin-top: 40px; display: none; color: #333; box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: slideUp 1s ease; }
+        @keyframes slideUp { from { opacity:0; transform: translateY(50px); } to { opacity:1; transform: translateY(0); } }
+
+        /* Mobile tweaks */
+        @media (max-width: 768px) {
+            .main-title { font-size: 2.5rem; }
+            .bubble { 
+                font-size: 1rem; 
+                max-width: 85%; 
+                margin: 8px 8px 8px auto; 
+                padding: 12px 16px; 
+            }
+            .bubble-left { 
+                max-width: 85%; 
+                margin: 8px auto 8px 8px; 
+                padding: 12px 16px; 
+            }
+            .bubble.large { 
+                max-width: 90%; 
+                font-size: 1.3rem; 
+            }
+            .question-text { font-size: 1.2rem; }
+            .option-btn { padding: 12px 18px; font-size: 0.95rem; min-width: 140px; }
+            .finale-title { font-size: 2rem; }
+            .polaroid { width: 220px; height: 300px; }
+            .heart { font-size: 35px; }
+            .question-wrapper { margin: 60px 0 30px; }
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    
+    <!-- Background layers -->
+    <div class="background-layer" id="bg-sunrise"></div>
+    <div class="background-layer" id="bg-morning"></div>
+    <div class="background-layer" id="bg-noon"></div>
+    <div class="background-layer" id="bg-afternoon"></div>
+    <div class="background-layer" id="bg-sunset"></div>
+    <div class="background-layer" id="bg-twilight"></div>
+    <div class="background-layer" id="bg-night"></div>
+
+    <div class="sunset-clouds" id="sunsetClouds"><div class="cloud cloud1"></div><div class="cloud cloud2"></div><div class="cloud cloud3"></div></div>
+    <div class="birds bird1">🦅</div><div class="birds bird2">🕊️</div><div class="birds bird3">🦅</div>
+    <div class="moon"></div>
+    <div id="stars-container"></div>
+
+    <!-- Hearts -->
+    <div class="hearts-container">
+        <div class="connection-line" id="connectionLine"></div>
+        <div class="heart heart-blue" id="heartBlue">💙</div>
+        <div class="heart heart-pink" id="heartPink">💖</div>
+        <div class="distance-label" id="distanceLabel">156 km</div>
+    </div>
+
+    <div class="container">
+        <section class="screen-intro" id="introScreen">
+            <h1 class="main-title">Hey Hermi 💙</h1>
+            <p class="subtitle">A little story for you...</p>
+            <button class="start-btn" onclick="startExperience()">Open</button>
+        </section>
+
+        <div id="mainContent" class="hidden">
+            <div class="chat-flow" id="chatFlow"></div>
+
+            <section class="finale-section" id="finaleSection">
+                <h2 class="finale-title">And here's my favorite part...<br><br>YOU! ✨</h2>
+                <div class="polaroid-stack" id="photoContainer"></div>
+
+                <div class="unlock-wrapper" id="unlockWrapper">
+                    <div class="unlock-btn" id="unlockBtn">💙</div>
+                    <canvas id="unlockCanvas" width="120" height="120" style="position:absolute; top:0; left:0; pointer-events:none;"></canvas>
+                </div>
+                <div class="unlock-hint">Hold & Don't Let Go 💙</div>
+
+                <div class="final-letter" id="finalLetter">
+                    <h2 style="color:#ec4899; font-family:'Playfair Display', serif;">You Matter. We Matter.</h2>
+                    <p style="font-size:1.2rem; margin:20px 0; line-height:1.6;">
+                        Thank you for being you. For your hard work, your smile, and for putting up with me.
+                        I promise to show up more. For real this time.
+                    </p>
+                    <p style="font-family:'Playfair Display', serif; font-size:1.5rem; font-weight:700; margin-top:30px;">- Tsega 💙</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Config / state
+        const PHOTO_FOLDER = 'photos/';
+        const MAX_PHOTOS = 10;
+        let scrollProgress = 0;
+        let isHolding = false;
+        let holdProgress = 0;
+        let frozenScrollPos = 0;
+        let scrollFrozen = false;
+        let hasStartedScrolling = false;
+        let heartCollisionTriggered = false;
+
+        // Elements
+        const heartBlue = document.getElementById('heartBlue');
+        const heartPink = document.getElementById('heartPink');
+        const connectionLine = document.getElementById('connectionLine');
+        const distanceLabel = document.getElementById('distanceLabel');
+        const chatFlow = document.getElementById('chatFlow');
+        const finaleSection = document.getElementById('finaleSection');
+        const scrollProgressBar = document.getElementById('scrollProgress');
+        const backgrounds = {
+            sunrise: document.getElementById('bg-sunrise'),
+            morning: document.getElementById('bg-morning'),
+            noon: document.getElementById('bg-noon'),
+            afternoon: document.getElementById('bg-afternoon'),
+            sunset: document.getElementById('bg-sunset'),
+            twilight: document.getElementById('bg-twilight'),
+            night: document.getElementById('bg-night')
+        };
+        const sunsetClouds = document.getElementById('sunsetClouds');
+        const birds = document.querySelectorAll('.birds');
+        const moon = document.querySelector('.moon');
+
+        // Chat content
+        const chatContent = [
+            { type: 'bubble', text: 'You know what\'s funny?' },
+            { type: 'bubble', text: 'I\'m here at University <span class="checkmark">✓</span>' },
+            { type: 'bubble', text: 'You\'re there in Addis <span class="checkmark">✓</span>' },
+            { type: 'bubble', text: '156 kilometers apart.' },
+            { type: 'bubble', text: 'But somehow...' },
+            { type: 'bubble', text: 'You\'re always right here. 💙', large: true },
+            { type: 'bubble', text: 'I know you have tight routine <span class="checkmark">✓</span>' },
+            { type: 'bubble', text: 'Like... ENTIRE day <span class="checkmark">✓</span>' },
+            { type: 'bubble', text: 'Your busy schedule that never stops...' },
+            { type: 'bubble', text: 'I see it all.' },
+            { type: 'bubble', text: 'Actually... let me test something.' },
+            { type: 'spacer', height: '30vh' },
+            {
+                type: 'question',
+                id: 'q1',
+                question: '"What do you think I\'m doing right now?"',
+                options: [
+                    { text: 'Probably studying', key: 'study' },
+                    { text: 'Thinking about me 😏', key: 'thinking' }
+                ],
+                responses: {
+                    study: 'Ha! Wrong. I mean yes, I SHOULD be studying... but I\'m actually thinking about you. Always multitasking 😅',
+                    thinking: 'See? You DO know me! Yeah, exactly that. Guilty as charged 💙'
+                }
+            },
+            { type: 'spacer', height: '20vh' },
+            { type: 'bubble', text: 'Here\'s the thing...' },
+            { type: 'bubble', text: 'I\'m not good with words.' },
+            { type: 'bubble', text: 'Like, REALLY not good.' },
+            { type: 'bubble', text: 'You probably noticed I don\'t call much.' },
+            { type: 'bubble', text: 'Or show up how I should.' },
+            { type: 'bubble', text: 'But Hermi...' },
+            { type: 'bubble', text: 'I\'m trying to say something here.' },
+            { type: 'bubble', text: 'Something I can\'t quite put into words...' },
+            { type: 'bubble', text: 'So let me ask instead:' },
+            { type: 'spacer', height: '30vh' },
+            {
+                type: 'question',
+                id: 'q2',
+                question: '"What emoji am I right now talking to you?"',
+                options: [
+                    { text: '😶 (can\'t find words)', key: 'words' },
+                    { text: '💙 (quietly caring)', key: 'caring' }
+                ],
+                responses: {
+                    words: 'YUP. 😶 That\'s me. Can\'t express feelings even when I want to. But hey, I made this whole thing instead of just texting \'hey\', so... progress? 😅',
+                    caring: '💙 Exactly. Just quietly caring from 156km away. Not good with words, but I hope you feel it anyway.'
+                }
+            },
+            { type: 'spacer', height: '20vh' },
+            { type: 'bubble', text: 'I think about you all the time.' },
+            { type: 'bubble', text: 'Not sometimes. ALL the time.' },
+            { type: 'bubble', text: 'Your hard work...' },
+            { type: 'bubble', text: 'Your smile...' },
+            { type: 'bubble', text: 'Even the way you text me...' },
+            { type: 'bubble', text: 'It all matters to me.' },
+            { type: 'bubble', text: 'More than I can put into words.', large: true },
+            { type: 'bubble', text: 'Speaking of which...' },
+            { type: 'spacer', height: '30vh' },
+            {
+                type: 'question',
+                id: 'q3',
+                question: '"Quick! Our distance as a food?"',
+                options: [
+                    { text: 'Chocolate - sweet but melts', key: 'sweet' },
+                    { text: 'Chocolate - bitter but worth it', key: 'bitter' }
+                ],
+                responses: {
+                    sweet: 'Ooh, poetic! Yeah, sweet like chocolate. And you LOVE chocolate, so maybe distance isn\'t so bad? 😏 But seriously, it melts away when we actually connect 🍫💙',
+                    bitter: 'Bitter but SO worth it! Just like dark chocolate - not easy, but the best kind. And you love chocolate, so you get it 🍫'
+                }
+            },
+            { type: 'spacer', height: '20vh' },
+            { type: 'bubble', text: '156 kilometers.' },
+            { type: 'bubble', text: 'That\'s the distance between us.' },
+            { type: 'bubble', text: 'But here\'s a secret...' },
+            { type: 'bubble', text: 'It feels smaller every day.', large: true },
+            { type: 'bubble', text: 'It\'s not really about the distance.' },
+            { type: 'bubble', text: 'It\'s about how easily you find your way into my thoughts.' },
+            { type: 'bubble', text: 'That\'s a different kind of closeness.' },
+            { type: 'spacer', height: '20vh' },
+            { type: 'bubble', text: 'There are miles between us, sure.' },
+            { type: 'bubble', text: 'But there\'s also understanding.' },
+            { type: 'bubble', text: 'And that matters more.' },
+            { type: 'spacer', height: '20vh' },
+            { type: 'bubble', text: 'Distance is physical.' },
+            { type: 'bubble', text: 'Connection isn\'t.' },
+            { type: 'bubble', text: 'And what we have doesn\'t depend on maps.', large: true },
+            { type: 'bubble', text: 'At least in the ways that matter.' },
+            { type: 'bubble', text: 'But imagine if we could actually...' },
+            { type: 'spacer', height: '30vh' },
+            {
+                type: 'question',
+                id: 'q4',
+                question: '"If you had a superpower right now, which one?"',
+                options: [
+                    { text: 'Read my mind', key: 'mind' },
+                    { text: 'Teleport to me', key: 'teleport' }
+                ],
+                responses: {
+                    mind: 'Dangerous choice! 😅 You\'d see that you\'re literally on my mind 24/7. My thoughts are just: Hermi, class, Hermi, food, Hermi, sleep... see the pattern?',
+                    teleport: 'EXACTLY what I was thinking! 156km would become 0km instantly. Just be there with you. That\'s all I need. 🚀'
+                }
+            },
+            { type: 'spacer', height: '20vh' },
+            { type: 'bubble', text: 'Since you mentioned it...' },
+            { type: 'bubble', text: 'If I really could teleport...' },
+            { type: 'bubble', text: 'What would we actually do?' },
+            { type: 'bubble', text: 'Let me guess what you\'re thinking...' },
+            { type: 'spacer', height: '30vh' },
+            {
+                type: 'question',
+                id: 'q5',
+                question: '"If I teleported to Addis right now, what would we do?"',
+                options: [
+                    { text: 'Watch sunset', key: 'sunset' },
+                    { text: 'Just sit and vibe', key: 'vibe' }
+                ],
+                responses: {
+                    sunset: 'YES! See, we\'re on the same wavelength. No coffee (I know you), just sunset. Comfortable silence. That\'s all I need 🌅',
+                    vibe: 'Exactly. Just... exist together. No pressure to talk or do anything crazy. Just be there. That\'s the vibe 💙'
+                }
+            },
+            { type: 'spacer', height: '20vh' },
+            { type: 'bubble', text: 'I don\'t know exactly where this goes, Hermi.' },
+            { type: 'bubble', text: 'But I know I want to find out.' },
+            { type: 'bubble', text: 'With you.', large: true },
+            { type: 'bubble', text: 'Despite the distance.' },
+            { type: 'bubble', text: 'Despite my terrible communication skills.' },
+            { type: 'bubble', text: 'Despite how busy we both are.' },
+            { type: 'bubble', text: 'I\'m here.', large: true },
+            { type: 'bubble', text: 'And I\'m not going anywhere.' },
+            { type: 'spacer', height: '30vh' },
+            { type: 'bubble', text: 'So yeah...' },
+            { type: 'bubble', text: 'This is me trying.' },
+            { type: 'bubble', text: 'Trying to show you what I can\'t say.' },
+            { type: 'bubble', text: 'Happy Valentine\'s Day, Hermi.', large: true },
+            { type: 'bubble', text: 'From Tsega,' },
+            { type: 'bubble', text: 'Who thinks about you way more than he admits.' },
+            { type: 'bubble', text: '💙' },
+            { type: 'bubble', text: 'Keep scrolling... one more thing...' },
+            { type: 'spacer', height: '60vh' }
+        ];
+
+        // Build chat
+        function buildChat() {
+            chatFlow.innerHTML = '';
+            chatContent.forEach((item, index) => {
+                if (item.type === 'bubble') {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'bubble' + (item.large ? ' large' : '');
+                    bubble.innerHTML = item.text;
+                    bubble.dataset.index = index;
+                    if (item.triggerCollision) {
+                        bubble.dataset.triggerCollision = 'true';
+                    }
+                    chatFlow.appendChild(bubble);
+                } else if (item.type === 'spacer') {
+                    const spacer = document.createElement('div');
+                    spacer.style.height = item.height;
+                    chatFlow.appendChild(spacer);
+                } else if (item.type === 'question') {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'question-wrapper';
+                    wrapper.dataset.questionId = item.id;
+                    wrapper.dataset.index = index;
+
+                    const questionText = document.createElement('div');
+                    questionText.className = 'question-text';
+                    questionText.textContent = item.question;
+
+                    const optionsContainer = document.createElement('div');
+                    optionsContainer.className = 'options-container';
+
+                    item.options.forEach(option => {
+                        const btn = document.createElement('button');
+                        btn.className = 'option-btn';
+                        btn.textContent = option.text;
+                        btn.onclick = () => handleAnswer(item.id, option.key, option.text, item.responses[option.key]);
+                        optionsContainer.appendChild(btn);
+                    });
+
+                    wrapper.appendChild(questionText);
+                    wrapper.appendChild(optionsContainer);
+                    chatFlow.appendChild(wrapper);
+                }
+            });
+        }
+
+        // Answer handler
+        function handleAnswer(questionId, key, choiceText, responseText) {
+            const wrapper = document.querySelector(`[data-question-id="${questionId}"]`);
+            if (!wrapper) return;
+            const buttons = wrapper.querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.disabled = true);
+
+            // Add her choice (left)
+            const herChoice = document.createElement('div');
+            herChoice.className = 'bubble bubble-left';
+            herChoice.textContent = choiceText;
+            wrapper.parentNode.insertBefore(herChoice, wrapper.nextSibling);
+
+            setTimeout(() => {
+                herChoice.classList.add('visible');
+
+                // Typing indicator
+                const typing = document.createElement('div');
+                typing.className = 'typing-indicator';
+                typing.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+                herChoice.parentNode.insertBefore(typing, herChoice.nextSibling);
+
+                setTimeout(() => {
+                    typing.classList.add('visible');
+
+                    setTimeout(() => {
+                        typing.remove();
+
+                        const myResponse = document.createElement('div');
+                        myResponse.className = 'bubble';
+                        myResponse.textContent = responseText;
+                        herChoice.parentNode.insertBefore(myResponse, herChoice.nextSibling);
+
+                        setTimeout(() => { 
+                            myResponse.classList.add('visible'); 
+                            unfreezeScroll(); 
+                        }, 100);
+                    }, 1600);
+                }, 100);
+            }, 300);
+        }
+
+        // Scroll freeze / unfreeze
+        function freezeScroll() {
+            if (scrollFrozen) return;
+            frozenScrollPos = window.scrollY;
+            document.body.classList.add('scroll-frozen');
+            document.body.style.top = `-${frozenScrollPos}px`;
+            scrollFrozen = true;
+        }
+        
+        function unfreezeScroll() {
+            if (!scrollFrozen) return;
+            document.body.classList.remove('scroll-frozen');
+            document.body.style.top = '';
+            window.scrollTo(0, frozenScrollPos);
+            scrollFrozen = false;
+        }
+
+        // Update scroll progress bar
+        function updateScrollProgress() {
+            const totalHeight = document.body.scrollHeight - window.innerHeight;
+            const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
+            scrollProgressBar.style.width = progress + '%';
+        }
+
+        // Observers
+        const bubbleObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+
+                    // Check for collision trigger
+                    if (entry.target.dataset.triggerCollision === 'true' && !heartCollisionTriggered) {
+                        heartCollisionTriggered = true;
+                        animateHeartsToCenter();
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        // Question observer - FIXED
+        const questionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.classList.contains('visible')) {
+                    // Make visible first
+                    entry.target.classList.add('visible');
+                    
+                    // Check if question still has enabled buttons
+                    const buttons = entry.target.querySelectorAll('.option-btn');
+                    const hasEnabledButton = Array.from(buttons).some(btn => !btn.disabled);
+                    
+                    if (hasEnabledButton) {
+                        // Delay freeze slightly to ensure smooth visibility
+                        setTimeout(() => {
+                            if (!scrollFrozen) {
+                                freezeScroll();
+                            }
+                        }, 400);
+                    }
+                }
+            });
+        }, { threshold: 0.5, rootMargin: '-50px 0px -50px 0px' });
+
+        const finaleObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.2 });
+
+        // Start experience
+        function startExperience() {
+            document.getElementById('introScreen').style.display = 'none';
+            document.getElementById('mainContent').classList.remove('hidden');
+            window.scrollTo(0, 0);
+            generateStars();
+            loadPhotos();
+            buildChat();
+
+            updateScrollProgress();
+
+            // Setup observers immediately
+            document.querySelectorAll('.bubble').forEach(bubble => {
+                bubbleObserver.observe(bubble);
+            });
+            
+            document.querySelectorAll('.question-wrapper').forEach(wrapper => {
+                questionObserver.observe(wrapper);
+            });
+
+            finaleObserver.observe(finaleSection);
+
+            // Initial updates
+            updateHearts();
+            updateBackground();
+        }
+
+        // Hearts update
+        function updateHearts() {
+            if (scrollFrozen) return;
+            const totalHeight = document.body.scrollHeight - window.innerHeight;
+            const progress = totalHeight > 0 ? Math.min(window.scrollY / totalHeight, 1) : 0;
+            scrollProgress = progress;
+
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            const blueStartX = window.innerWidth * 0.12;
+            const blueStartY = window.innerHeight * 0.14;
+            const blueX = blueStartX + (centerX - blueStartX) * scrollProgress;
+            const blueY = blueStartY + (centerY - blueStartY) * scrollProgress;
+
+            const pinkStartX = window.innerWidth * 0.88;
+            const pinkStartY = window.innerHeight * 0.86;
+            const pinkX = pinkStartX + (centerX - pinkStartX) * scrollProgress;
+            const pinkY = pinkStartY + (centerY - pinkStartY) * scrollProgress;
+
+            heartBlue.style.left = blueX + 'px';
+            heartBlue.style.top = blueY + 'px';
+            heartPink.style.left = pinkX + 'px';
+            heartPink.style.top = pinkY + 'px';
+
+            const dx = pinkX - blueX;
+            const dy = pinkY - blueY;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+            connectionLine.style.left = blueX + 'px';
+            connectionLine.style.top = blueY + 'px';
+            connectionLine.style.width = length + 'px';
+            connectionLine.style.transform = `rotate(${angle}deg)`;
+
+            const distance = Math.max(0, Math.round(156 * (1 - scrollProgress)));
+            distanceLabel.textContent = distance === 0 ? 'Here 💙' : distance + ' km';
+            distanceLabel.style.left = (blueX + pinkX) / 2 + 'px';
+            distanceLabel.style.top = (blueY + pinkY) / 2 - 35 + 'px';
+            distanceLabel.style.opacity = distance === 0 ? '0' : '1';
+        }
+
+        // Force hearts to center
+        function animateHeartsToCenter() {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            const frames = 20;
+            let frame = 0;
+            const startBlue = {
+                x: parseFloat(heartBlue.style.left || (window.innerWidth * 0.15)),
+                y: parseFloat(heartBlue.style.top || (window.innerHeight * 0.15))
+            };
+            const startPink = {
+                x: parseFloat(heartPink.style.left || (window.innerWidth * 0.85)),
+                y: parseFloat(heartPink.style.top || (window.innerHeight * 0.85))
+            };
+
+            function step() {
+                frame++;
+                const t = frame / frames;
+                const ease = t * (2 - t);
+                const blueX = startBlue.x + (centerX - startBlue.x) * ease;
+                const blueY = startBlue.y + (centerY - startBlue.y) * ease;
+                const pinkX = startPink.x + (centerX - startPink.x) * ease;
+                const pinkY = startPink.y + (centerY - startPink.y) * ease;
+
+                heartBlue.style.left = blueX + 'px';
+                heartBlue.style.top = blueY + 'px';
+                heartPink.style.left = pinkX + 'px';
+                heartPink.style.top = pinkY + 'px';
+
+                const dx = pinkX - blueX;
+                const dy = pinkY - blueY;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                connectionLine.style.left = blueX + 'px';
+                connectionLine.style.top = blueY + 'px';
+                connectionLine.style.width = length + 'px';
+                connectionLine.style.transform = `rotate(${angle}deg)`;
+                distanceLabel.style.left = (blueX + pinkX) / 2 + 'px';
+                distanceLabel.style.top = (blueY + pinkY) / 2 - 35 + 'px';
+                distanceLabel.style.opacity = '0';
+
+                if (frame < frames) {
+                    requestAnimationFrame(step);
+                } else {
+                    heartBlue.style.transform = 'scale(1.3)';
+                    heartPink.style.transform = 'scale(1.3)';
+                    setTimeout(() => { 
+                        heartBlue.style.transform = ''; 
+                        heartPink.style.transform = ''; 
+                    }, 500);
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        // Background update
+        function updateBackground() {
+            if (scrollFrozen) return;
+            const totalHeight = document.body.scrollHeight - window.innerHeight;
+            const progress = totalHeight > 0 ? window.scrollY / totalHeight : 0;
+            Object.values(backgrounds).forEach(bg => bg.style.opacity = 0);
+
+            if (progress < 0.15) { 
+                backgrounds.sunrise.style.opacity = 1; 
+                birds.forEach(b => b.style.opacity = 0.8); 
+            } else if (progress < 0.25) {
+                const t = (progress - 0.15) / 0.1;
+                backgrounds.sunrise.style.opacity = 1 - t; 
+                backgrounds.morning.style.opacity = t; 
+                birds.forEach(b => b.style.opacity = 0.9);
+            } else if (progress < 0.35) {
+                const t = (progress - 0.25) / 0.1;
+                backgrounds.morning.style.opacity = 1 - t; 
+                backgrounds.noon.style.opacity = t; 
+                birds.forEach(b => b.style.opacity = 0.7);
+            } else if (progress < 0.5) {
+                const t = (progress - 0.35) / 0.15;
+                backgrounds.noon.style.opacity = 1 - t; 
+                backgrounds.afternoon.style.opacity = t; 
+                birds.forEach(b => b.style.opacity = 0.5);
+            } else if (progress < 0.7) {
+                const t = (progress - 0.5) / 0.2;
+                backgrounds.afternoon.style.opacity = 1 - t; 
+                backgrounds.sunset.style.opacity = t; 
+                sunsetClouds.style.opacity = t; 
+                birds.forEach(b => b.style.opacity = 0.3 * (1 - t));
+            } else if (progress < 0.85) {
+                const t = (progress - 0.7) / 0.15;
+                backgrounds.sunset.style.opacity = 1 - t; 
+                backgrounds.twilight.style.opacity = t; 
+                sunsetClouds.style.opacity = 1 - t; 
+                moon.style.opacity = t * 0.6;
+            } else {
+                const t = (progress - 0.85) / 0.15;
+                backgrounds.twilight.style.opacity = 1 - t; 
+                backgrounds.night.style.opacity = t; 
+                moon.style.opacity = 0.6 + t * 0.4;
+                document.querySelectorAll('.stars').forEach((star, i) => {
+                    star.style.opacity = t;
+                    if (t > 0.5) { 
+                        star.style.animation = `twinkle ${2 + Math.random() * 2}s infinite ${Math.random() * 2}s`; 
+                    }
+                });
+            }
+        }
+
+        // Generate stars
+        function generateStars() {
+            const container = document.getElementById('stars-container');
+            container.innerHTML = '';
+            for (let i = 0; i < 120; i++) {
+                const star = document.createElement('div');
+                star.className = 'stars';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                container.appendChild(star);
+            }
+        }
+
+        // Load photos
+        async function loadPhotos() {
+            const photoContainer = document.getElementById('photoContainer');
+            const loadedPhotos = [];
+            const patterns = [
+                'photo1.jpg','photo2.jpg','photo3.jpg','photo4.jpg','photo5.jpg','photo6.jpg','photo7.jpg','photo8.jpg',
+                'photo1.png','photo2.png','photo3.png','photo4.png','1.jpg','2.jpg','3.jpg','4.jpg','hermi1.jpg','hermi2.jpg','hermi3.jpg','hermi4.jpg'
+            ];
+            for (const filename of patterns) {
+                try {
+                    const img = new Image();
+                    img.src = PHOTO_FOLDER + filename;
+                    await new Promise((resolve, reject) => {
+                        img.onload = () => { loadedPhotos.push(PHOTO_FOLDER + filename); resolve(); };
+                        img.onerror = reject;
+                        setTimeout(reject, 400);
+                    });
+                } catch (e) {}
+                if (loadedPhotos.length >= MAX_PHOTOS) break;
+            }
+            const rotations = ['-8deg','5deg','-12deg','10deg','-5deg','15deg'];
+            if (loadedPhotos.length > 0) {
+                loadedPhotos.slice(0,6).forEach((photoSrc, index) => {
+                    const polaroid = document.createElement('div');
+                    polaroid.className = 'polaroid';
+                    polaroid.style.setProperty('--rot', rotations[index]);
+                    polaroid.style.zIndex = loadedPhotos.length - index;
+                    const img = document.createElement('img');
+                    img.src = photoSrc;
+                    img.alt = 'Hermi';
+                    polaroid.appendChild(img);
+                    photoContainer.appendChild(polaroid);
+                });
+            } else {
+                for (let i=0;i<3;i++){
+                    const polaroid = document.createElement('div');
+                    polaroid.className = 'polaroid';
+                    polaroid.style.setProperty('--rot', rotations[i]);
+                    polaroid.style.zIndex = 3 - i;
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'photo-placeholder';
+                    placeholder.textContent = '📷';
+                    polaroid.appendChild(placeholder);
+                    photoContainer.appendChild(polaroid);
+                }
+            }
+        }
+
+        // Unlock canvas and hold behavior
+        const canvas = document.getElementById('unlockCanvas');
+        const ctx = canvas.getContext('2d');
+        const unlockBtn = document.getElementById('unlockBtn');
+        const scale = window.devicePixelRatio || 1;
+        canvas.width = 120 * scale; 
+        canvas.height = 120 * scale; 
+        ctx.scale(scale, scale);
+        
+        function drawProgress(p) {
+            ctx.clearRect(0,0,120,120);
+            ctx.beginPath();
+            ctx.arc(60,60,50,-Math.PI/2,(-Math.PI/2)+(Math.PI*2*(p/100)));
+            ctx.strokeStyle = '#ec4899'; 
+            ctx.lineWidth = 5; 
+            ctx.lineCap = 'round'; 
+            ctx.stroke();
+        }
+        
+        function unlockAnimation() {
+            if (isHolding) {
+                holdProgress += 2;
+                drawProgress(holdProgress);
+                unlockBtn.style.transform = `translate(-50%,-50%) scale(${1 + holdProgress/500})`;
+                if (holdProgress >= 100) {
+                    completeUnlock();
+                } else {
+                    requestAnimationFrame(unlockAnimation);
+                }
+            } else {
+                if (holdProgress > 0) {
+                    holdProgress -= 5;
+                    drawProgress(holdProgress);
+                    requestAnimationFrame(unlockAnimation);
+                } else {
+                    ctx.clearRect(0,0,120,120);
+                }
+            }
+        }
+
+        // Celebration
+        function createCelebration() {
+            const colors = ['#ec4899','#4a90e2','#ffd93d','#4ade80','#f97316','#a78bfa'];
+            for (let i=0;i<100;i++){
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti-piece';
+                confetti.style.left = '50%';
+                confetti.style.top = '50%';
+                confetti.style.background = colors[Math.floor(Math.random()*colors.length)];
+                confetti.style.setProperty('--drift', (Math.random()*400 - 200) + 'px');
+                confetti.style.animation = `confettiFall ${2 + Math.random()}s ease-out forwards`;
+                confetti.style.animationDelay = Math.random()*0.3 + 's';
+                document.body.appendChild(confetti);
+                setTimeout(()=>confetti.remove(), 3000);
+            }
+        }
+
+        // Complete unlock
+        function completeUnlock() {
+            isHolding = false;
+            holdProgress = 100;
+            drawProgress(100);
+            document.getElementById('unlockWrapper').style.display = 'none';
+
+            createCelebration();
+
+            const photos = document.querySelectorAll('.polaroid');
+            const offsets = [
+                { x: -150, y: 30 },{ x: 150, y: 50 },{ x: 0, y: -70 },
+                { x: -100, y: -40 },{ x: 120, y: -30 },{ x: 50, y: 80 }
+            ];
+            photos.forEach((p,i) => {
+                if (offsets[i]) {
+                    p.style.setProperty('--tx', offsets[i].x + 'px');
+                    p.style.setProperty('--ty', offsets[i].y + 'px');
+                }
+                p.classList.add('shown'); 
+                p.classList.add('scatter');
+            });
+
+            setTimeout(() => {
+                document.getElementById('finalLetter').style.display = 'block';
+            }, 600);
+        }
+
+        const startHold = (e) => { 
+            e.preventDefault(); 
+            isHolding = true; 
+            unlockAnimation(); 
+        };
+        const endHold = (e) => { 
+            e.preventDefault(); 
+            isHolding = false; 
+        };
+        
+        unlockBtn.addEventListener('mousedown', startHold);
+        unlockBtn.addEventListener('touchstart', startHold);
+        unlockBtn.addEventListener('mouseup', endHold);
+        unlockBtn.addEventListener('touchend', endHold);
+        unlockBtn.addEventListener('mouseleave', endHold);
+        unlockBtn.addEventListener('touchcancel', endHold);
+
+        // Scroll listener
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    updateScrollProgress();
+                    updateHearts();
+                    updateBackground();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+    </script>
+</body>
+</html>
